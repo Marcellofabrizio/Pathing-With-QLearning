@@ -3,9 +3,9 @@ import numpy as np
 
 class QLearn:
 
-    def __init__(self, states_size, actions_size, gamma = .15, eppsilon = .3):
-        self.__gamma = gamma
-        self.__epsilon = eppsilon
+    def __init__(self, states_size, actions_size, gamma = .80, eppsilon = .3):
+        self.__gamma = gamma      # gamma will be used to balance immediate and future reward
+        self.__epsilon = eppsilon # eppsilon the rate in which exploration will be performed over exploitation
         self.__q_table = np.zeros((states_size, actions_size))
 
     def take_action(self, state):
@@ -35,7 +35,7 @@ class QLearn:
         Q[state, action] = Q[state, action] + lr * (reward + gamma * np.max(Q[new_state, :]) — Q[state, action])
         '''
 
-        self.__q_table[state][action] = self.reward(state, action) + self._gamma * np.max(self.__q_table[new_state, :] - self.__q_table[state, action])
+        self.__q_table[state][action] = self.reward(state, action) + self.__gamma * np.max(self.__q_table[new_state, :] - self.__q_table[state, action])
 
     def reward(self, state, action):
         '''
