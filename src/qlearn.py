@@ -34,3 +34,14 @@ class QLearn:
 
         Q[state, action] = Q[state, action] + lr * (reward + gamma * np.max(Q[new_state, :]) — Q[state, action])
         '''
+
+        self.__q_table[state][action] = self.reward(state, action) + self._gamma * np.max(self.__q_table[new_state, :] - self.__q_table[state, action])
+
+    def reward(self, state, action):
+        '''
+        Returns the given reward for state, action.
+        In our case, this will be the value from the qtable
+        '''
+
+        return self.__q_table[state][action]
+
