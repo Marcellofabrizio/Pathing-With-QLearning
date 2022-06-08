@@ -86,4 +86,4 @@ class QLearn:
         The agent will check all possible actions from given state and
         slects the action with the maximum value between them. 
         '''
-        return np.max(self.__q_table[env_row, env_col])
+        return np.argmax(self.__q_table[env_row, env_col])
