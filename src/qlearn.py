@@ -4,7 +4,7 @@ import numpy as np
 
 class QLearn:
 
-    def __init__(self, enviroment, gamma=.80, eppsilon=.3):
+    def __init__(self, enviroment, gamma=.90, eppsilon=.7):
         self.__actions = ['up', 'right', 'down', 'left']
         # gamma will be used to balance immediate and future reward
         self.__gamma = gamma
@@ -29,12 +29,8 @@ class QLearn:
 
             row, col = 2, 2
 
-            while self.__rewards[row][col] == -1:
-
+            while self.__rewards[row][col] != 100:
                 row, col = self.update_q_value(row, col)
-                if(self.__rewards[row][col] == 100):
-                    print(row, col)
-
 
     def update_q_value(self, row, col):
         '''
@@ -46,18 +42,17 @@ class QLearn:
         # takes action based on state
         action = self.get_next_action(row, col)
         old_row, old_col = row, col
-        
-        # reacts to action                 
+
+        # reacts to action
         row, col = self.get_next_location(old_row, old_col, action)
 
         # receive reward for the reaction
         reward = self.reward(row, col)
         old_q_value = self.__q_table[old_row, old_col, action]
 
-        temp_difference = reward + self.__gamma * np.max(self.__q_table[row, col]) - old_q_value
+        temp_difference = reward + (self.__gamma * np.max(self.__q_table[row, col])) - old_q_value
 
-        self.__q_table[row, col, action] = old_q_value + temp_difference
-        # print(self.__q_table[row, col, action])
+        self.__q_table[old_row, old_col, action] = old_q_value + temp_difference
         return row, col
 
     def get_initial_state(self):
@@ -89,45 +84,48 @@ class QLearn:
 
         return row, col
 
-
     def get_next_action(self, env_row, env_col):
 
-        if random.uniform(0, 1) < self.__eppsilon:
-            'Explore: select random action'
-            return self.explore()
-        else:
+        if np.random.random() < self.__eppsilon:
             'Exploit: return action with maximum score'
             return self.exploit(env_row, env_col)
+        else:
+            'Explore: select random action'
+            return self.explore()
 
     def explore(self):
         '''
-        The agent will randomly check actions to explore its states and 
-        environment. 
+        The agent will randomly check actions to explore its states and
+        environment.
         '''
-        return random.randint(0,3)
+        return random.randint(0, 3)
 
     def exploit(self, env_row, env_col):
         '''
         The agent will check all possible actions from given state and
-        slects the action with the maximum value between them. 
+        slects the action with the maximum value between them.
         '''
         return np.argmax(self.__q_table[env_row, env_col])
 
     def get_shortest_path(self, initial_row, initial_col):
 
         shortest_path = []
+        current_row, current_col = initial_row, initial_col
 
-        current_row = initial_row
-        current_col = initial_col 
-
-        if self.__rewards[initial_row][initial_col] == -100:
-            return []
+        if self.__rewards[current_row][current_col] == -100:
+            return shortest_path
 
         else:
-
-            while self.__rewards[current_row][current_col] == -1:
+            shortest_path.append((current_row, current_col))
+            while self.__rewards[current_row][current_col] != 100:
                 action = self.exploit(current_row, current_col)
                 current_row, current_col = self.get_next_location(current_row, current_col, action)
+
                 shortest_path.append((current_row, current_col))
 
         return shortest_path
+
+    def print_qtable(self):
+        for i in range(self.__env_rows):
+            for j in range(self.__env_cols):
+                print(self.__q_table[i, j])
