@@ -19,6 +19,21 @@ class QLearn:
         # two dimensional array for rewards per State
         self.__rewards = enviroment.map
 
+    def train(self, episodes):
+        '''
+        Trains the data on given episodes by retrieving new actions
+        and updating the q-table
+        '''
+
+        for i in range(episodes):
+
+            row, col = get_initial_state()
+
+            while self.__rewards[row, col] == -1:
+
+                row, col = self.update_q_value(row, col)
+
+
     def update_q_value(self, row, col):
         '''
         Update the new_state in __q_table with a new action value
@@ -28,17 +43,24 @@ class QLearn:
 
         # takes action based on state
         action = self.get_next_action(row, col)
-
-        # reacts to given action
-        new_row, new_col = self.get_next_location(row, col, action)
+        old_row, old_col = row, col
+        
+        # reacts to action                 
+        row, col = self.get_next_location(old_row, old_col, action)
 
         # receive reward for the reaction
         reward = self.reward(row, col)
-        old_q_value = self.__q_table[row, col, action]
+        old_q_value = self.__q_table[old_row, old_col, action]
 
-        temp_difference = reward + self.__gamma * np.max(self.__q_table[new_row, new_col]) - old_q_value
+        temp_difference = reward + self.__gamma * np.max(self.__q_table[row, col]) - old_q_value
 
         self.__q_table[row, col, action] = old_q_value + temp_difference
+        return row, col
+
+    def get_initial_state(self):
+        '''
+        Retrieve initial state
+        '''
 
     def reward(self, row, col):
         '''
