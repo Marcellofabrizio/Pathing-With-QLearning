@@ -27,7 +27,7 @@ class QLearn:
 
         for i in range(episodes):
 
-            row, col = get_initial_state()
+            row, col = 3, 5
 
             while self.__rewards[row, col] == -1:
 
