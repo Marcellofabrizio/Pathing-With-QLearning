@@ -4,20 +4,20 @@ import numpy as np
 
 class QLearn:
 
-    def __init__(self, enviroment, gamma=.80, eppsilon=.3):
+    def __init__(self, environment, gamma=.80, eppsilon=.3):
         self.__actions = ['up', 'right', 'down', 'left']
         # gamma will be used to balance immediate and future reward
         self.__gamma = gamma
-        # eppsilon the rate in which exploration will be performed over exploitation
+        # eppsilon is the rate in which exploration will be performed over exploitation
         self.__eppsilon = eppsilon
 
-        self.__env_rows, self.__env_cols = enviroment.shape
+        self.__env_rows, self.__env_cols = environment.shape
 
         # three dimensional array for States and Actions
         self.__q_table = np.zeros((self.__env_rows, self.__env_cols, 4))
 
         # two dimensional array for rewards per State
-        self.__rewards = enviroment.map
+        self.__rewards = environment.map
 
     def train(self, episodes):
         '''
@@ -65,7 +65,7 @@ class QLearn:
     def reward(self, row, col):
         '''
         Returns the given reward for state, action.
-        In our case, this will be the value from the enviroment
+        In our case, this will be the value from the environment
         '''
 
         return self.__rewards[row, col]
@@ -106,6 +106,6 @@ class QLearn:
     def exploit(self, env_row, env_col):
         '''
         The agent will check all possible actions from given state and
-        slects the action with the maximum value between them. 
+        selects the action with the maximum value between them. 
         '''
         return np.argmax(self.__q_table[env_row, env_col])
