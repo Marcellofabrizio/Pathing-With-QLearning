@@ -7,4 +7,4 @@ class Environment:
 
     @property
     def shape(self):
-        return (self.rows, self.cols)
+        return self.rows, self.cols
