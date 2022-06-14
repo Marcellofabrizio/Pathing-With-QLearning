@@ -4,27 +4,31 @@ from codes import Action
 
 class Environment:
 
-    def __init__(self, map):
+    def __init__(self, map, initial_row=10, initial_col=5):
         self.rows = len(map)
         self.cols = len(map[0])
         self.map = map
+        self._initial_row = initial_row
+        self._initial_col = initial_col
 
     @property
     def shape(self):
         return self.rows, self.cols
 
-    def get_initial_state(self):
+    def get_initial_state(self, fixed):
         """
-        Returns a random, but valid, initial position for each episode. This facilitates
-        exploration of the entire map.
+        Returns either a random, but valid, initial position for each episode or the user-defined one.
         """
 
-        while True:
-            row = random.randint(0, self.rows - 1)
-            col = random.randint(0, self.cols - 1)
+        if fixed:
+            return self._initial_row, self._initial_col
+        else:
+            while True:
+                row = random.randint(0, self.rows - 1)
+                col = random.randint(0, self.cols - 1)
 
-            if self.reward(row, col) == -1:
-                break
+                if self.reward(row, col) == -1:
+                    break
 
         return row, col
 
@@ -40,6 +44,7 @@ class Environment:
         row = env_row
         col = env_col
 
+        # TODO(Ainda não confio muito nisso aqui, honestamente)
         if action == Action.UP and env_row > 0:
             row -= 1
         elif action == Action.DOWN and env_row < self.rows - 1:

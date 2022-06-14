@@ -17,16 +17,17 @@ class QLearn:
 
         self.__env = environment  # type: Environment
 
-    def train(self, episodes):
+    def train(self, episodes, fixed_exploration):
         """
         Repeatedly map out the environment over given number of episodes,
         updating Q-Table along.
-        To maximize exploration, each episode starts from a random position
-        and ends only when it reaches the objective.
+        If fixed_exploration is set, each episode will start from the user-defined starting position.
+        Otherwise, in order to maximize exploration, each episode will start from a random position.
+        In either case, an episode finishes only once the objective is reached.
         """
 
         for i in range(episodes):
-            row, col = self.__env.get_initial_state()
+            row, col = self.__env.get_initial_state(fixed_exploration)
 
             while self.__env.reward(row, col) != Rewards.OBJECTIVE:
                 row, col = self.update_q_value(row, col)
