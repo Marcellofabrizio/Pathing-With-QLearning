@@ -1,7 +1,9 @@
+from lib2to3.pgen2.token import ATEQUAL
 import random
 import numpy as np
 from typing import List
 from environment import Environment
+from grid import Grid
 from codes import Action, Rewards
 
 
@@ -26,11 +28,17 @@ class QLearn:
         In either case, an episode finishes only once the objective is reached.
         """
 
+        ep_counter = 0
+
         for i in range(episodes):
             row, col = self.__env.get_initial_state(fixed_exploration)
 
-            while self.__env.reward(row, col) != Rewards.OBJECTIVE:
-                row, col = self.update_q_value(row, col)
+            ep_counter += 1
+            try:
+                while self.__env.reward(row, col) != Rewards.OBJECTIVE:
+                        row, col = self.update_q_value(row, col)
+            except StuckException:
+                continue
 
     def update_q_value(self, row, col):
         """
@@ -39,6 +47,8 @@ class QLearn:
         Q[state, action] = Q[state, action] + lr * (reward + gamma * np.max(Q[new_state, :]) — Q[state, action])
         """
 
+        attempts = 0
+
         # Get the next action
         action = self.get_next_action(row, col)
         old_row, old_col = row, col
@@ -46,6 +56,14 @@ class QLearn:
         # Perform the action, changing current state
         row, col = self.__env.get_next_location(old_row, old_col, action)
 
+        while self.__env.reward(row, col) == Rewards.WALL and attempts < 10:
+            action = self.get_next_action(old_row, old_col)
+            row, col = self.__env.get_next_location(old_row, old_col, action)
+            attempts += 1
+
+        if attempts == 10:
+            raise StuckException
+            
         # Get the reward associated with reaching new state
         reward = self.__env.reward(row, col)
         old_q_value = self.__q_table[old_row, old_col, action.value]
@@ -78,26 +96,31 @@ class QLearn:
         """
         return Action(random.randint(0, 3))
 
-    def get_shortest_path(self, initial_row, initial_col) -> List[Action]:
+    def get_optimal_actions(self, initial_row, initial_col) -> List[Action]:
 
-        shortest_path = []
+        actions = []
         current_row, current_col = initial_row, initial_col
 
         # TODO(Ainda não tem uma condição de saída caso não encontre)
 
         if self.__env.reward(initial_row, initial_col) != Rewards.CELL:
-            return shortest_path
+            return actions
 
         else:
-            while self.__env.reward(current_row, current_col) != Rewards.OBJECTIVE:
+            attempts = 0
+            while self.__env.reward(current_row, current_col) != Rewards.OBJECTIVE and attempts < 1:
                 action = self.exploit(current_row, current_col)
                 current_row, current_col = self.__env.get_next_location(current_row, current_col, action)
+                
+                if self.__env.reward(current_row, current_col) != Rewards.WALL:
+                    actions.append(action)
+                    attempts = 0
+                else:
+                    attempts += 1
 
-                shortest_path.append(action)
+        return actions
 
-        return shortest_path
-
-    def print_shortest_path(self, shortest_path: List[Action], initial_row, initial_col):
+    def print_shortest_path(self, actions: List[Action], initial_row, initial_col):
         reward = self.__env.reward(initial_row, initial_col)
         if reward == Rewards.WALL:
             print('Initial position is a wall!')
@@ -109,15 +132,25 @@ class QLearn:
             print(f'Starting from ({initial_row}, {initial_col})')
 
         steps = 0
+        path = []
         cur_row, cur_col = initial_row, initial_col
-        for action in shortest_path:
+        path.append((cur_row, cur_col))
+
+        for action in actions:
             cur_row, cur_col = self.__env.get_next_location(cur_row, cur_col, action)
             steps += 1
             print(f'Move {action.name.title()} to ({cur_row}, {cur_col})')
+            path.append((cur_row, cur_col))
 
         print(f'Reached objective at ({cur_row}, {cur_col}) in {steps} steps!')
+        Grid.draw_path(self.__env.map, path)
 
     def print_qtable(self):
         for i in range(self.__env.rows):
             for j in range(self.__env.cols):
                 print(self.__q_table[i, j])
+
+class StuckException(Exception):
+
+    def __init__(self):
+        pass
