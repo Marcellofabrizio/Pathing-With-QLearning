@@ -1,8 +1,9 @@
-from environment import Environment
-from qlearn import QLearn
 import argparse
 import data
 
+from environment import Environment
+from qlearn import QLearn
+from grid import Grid
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Finding the optimal path to an objective with Q-Learning.')
@@ -22,12 +23,12 @@ def parse_args():
 
 def read_initial_position():
     row, col = '', ''
-    position = input('Please insert the starting position (x,y) or press Enter to exit: ')
+    input_value = input('Please insert the starting position (x,y) or press Enter to exit: ')
 
     try:
-        row, col = [int(n) for n in position.split(',')]
+        row, col = [int(n) for n in input_value.split(',')]
     except ValueError:
-        if position:
+        if input_value:
             print('Invalid position.')
 
     return row, col
@@ -42,9 +43,8 @@ if __name__ == '__main__':
     if fixed_exploration:
         initial_row, initial_col = read_initial_position()
         qlearn.train(episodes, fixed_exploration=True)
-
-        shortest_path = qlearn.get_shortest_path(initial_row, initial_col)
-        qlearn.print_shortest_path(shortest_path, initial_row, initial_col)
+        actions = qlearn.get_optimal_actions(initial_row, initial_col)
+        qlearn.print_shortest_path(actions, initial_row, initial_col)
 
     else:
         qlearn.train(episodes, fixed_exploration=False)
@@ -54,5 +54,5 @@ if __name__ == '__main__':
             if not initial_row or not initial_col:
                 break
 
-            shortest_path = qlearn.get_shortest_path(initial_row, initial_col)
-            qlearn.print_shortest_path(shortest_path, initial_row, initial_col)
+            actions = qlearn.get_optimal_actions(initial_row, initial_col)
+            qlearn.print_shortest_path(actions, initial_row, initial_col)
