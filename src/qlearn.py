@@ -19,6 +19,8 @@ class QLearn:
 
         self.__env = environment  # type: Environment
 
+        self.optimal_episode = None
+
     def train(self, episodes, fixed_exploration):
         """
         Repeatedly map out the environment over given number of episodes,
@@ -28,12 +30,9 @@ class QLearn:
         In either case, an episode finishes only once the objective is reached.
         """
 
-        ep_counter = 0
-
         for i in range(episodes):
             row, col = self.__env.get_initial_state(fixed_exploration)
 
-            ep_counter += 1
             try:
                 while self.__env.reward(row, col) != Rewards.OBJECTIVE:
                         row, col = self.update_q_value(row, col)
@@ -46,6 +45,8 @@ class QLearn:
 
         Q[state, action] = Q[state, action] + lr * (reward + gamma * np.max(Q[new_state, :]) — Q[state, action])
         """
+
+        self.__prev_q_table = np.copy(self.__q_table)
 
         attempts = 0
 
@@ -149,6 +150,15 @@ class QLearn:
         for i in range(self.__env.rows):
             for j in range(self.__env.cols):
                 print(self.__q_table[i, j])
+    
+    @property
+    def table_unchanged(self):
+        for i in range(self.__env.rows):
+            for j in range(self.__env.cols):
+                if not np.allclose(self.__q_table[i, j], self.__prev_q_table[i, j]):
+                    return False
+        
+        return True
 
 class StuckException(Exception):
 

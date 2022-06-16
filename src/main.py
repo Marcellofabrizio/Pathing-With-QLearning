@@ -5,8 +5,10 @@ from environment import Environment
 from qlearn import QLearn
 from grid import Grid
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description='Finding the optimal path to an objective with Q-Learning.')
+    parser = argparse.ArgumentParser(
+        description='Finding the optimal path to an objective with Q-Learning.')
 
     parser.add_argument('-f', '--fixed-exploration',
                         action='store_true', dest='fixed_exploration',
@@ -23,7 +25,8 @@ def parse_args():
 
 def read_initial_position():
     row, col = '', ''
-    input_value = input('Please insert the starting position (x,y) or press Enter to exit: ')
+    input_value = input(
+        'Please insert the starting position (x,y) or press Enter to exit: ')
 
     try:
         row, col = [int(n) for n in input_value.split(',')]
