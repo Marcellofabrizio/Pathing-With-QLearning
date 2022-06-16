@@ -1,12 +1,12 @@
-from hashlib import new
 from matplotlib import colors
 import matplotlib.pyplot as plt
 
 from codes import Rewards
 
+
 class Grid:
 
-    def __init__(self, environment):
+    def __init__(self):
         pass
 
     @staticmethod
@@ -16,7 +16,7 @@ class Grid:
         for cell in path:
             new_map[cell[0]][cell[1]] = Rewards.OBJECTIVE
 
-        cmap = colors.ListedColormap(['black','white','green'])
+        cmap = colors.ListedColormap(['black', 'white', 'green'])
 
-        img = plt.imshow(map, interpolation='nearest', cmap=cmap)
+        plt.imshow(map, interpolation='nearest', cmap=cmap)
         plt.show()

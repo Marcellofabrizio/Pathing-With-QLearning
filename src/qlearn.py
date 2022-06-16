@@ -36,7 +36,7 @@ class QLearn:
             ep_counter += 1
             try:
                 while self.__env.reward(row, col) != Rewards.OBJECTIVE:
-                        row, col = self.update_q_value(row, col)
+                    row, col = self.update_q_value(row, col)
             except StuckException:
                 continue
 
@@ -63,7 +63,7 @@ class QLearn:
 
         if attempts == 10:
             raise StuckException
-            
+
         # Get the reward associated with reaching new state
         reward = self.__env.reward(row, col)
         old_q_value = self.__q_table[old_row, old_col, action.value]
@@ -101,8 +101,6 @@ class QLearn:
         actions = []
         current_row, current_col = initial_row, initial_col
 
-        # TODO(Ainda não tem uma condição de saída caso não encontre)
-
         if self.__env.reward(initial_row, initial_col) != Rewards.CELL:
             return actions
 
@@ -111,7 +109,7 @@ class QLearn:
             while self.__env.reward(current_row, current_col) != Rewards.OBJECTIVE and attempts < 1:
                 action = self.exploit(current_row, current_col)
                 current_row, current_col = self.__env.get_next_location(current_row, current_col, action)
-                
+
                 if self.__env.reward(current_row, current_col) != Rewards.WALL:
                     actions.append(action)
                     attempts = 0
@@ -123,13 +121,13 @@ class QLearn:
     def print_shortest_path(self, actions: List[Action], initial_row, initial_col):
         reward = self.__env.reward(initial_row, initial_col)
         if reward == Rewards.WALL:
-            print('Initial position is a wall!')
+            print('Posição inicial é uma parede!')
             return
         elif reward == Rewards.OBJECTIVE:
-            print('Initial position is on the objective itself.')
+            print('Posição inicial já é o objetivo!')
             return
         else:
-            print(f'Starting from ({initial_row}, {initial_col})')
+            print(f'Começando de ({initial_row}, {initial_col})')
 
         steps = 0
         path = []
@@ -139,10 +137,10 @@ class QLearn:
         for action in actions:
             cur_row, cur_col = self.__env.get_next_location(cur_row, cur_col, action)
             steps += 1
-            print(f'Move {action.name.title()} to ({cur_row}, {cur_col})')
+            print(f'Ir para {action} até ({cur_row}, {cur_col})')
             path.append((cur_row, cur_col))
 
-        print(f'Reached objective at ({cur_row}, {cur_col}) in {steps} steps!')
+        print(f'Chegou no objetivo em ({cur_row}, {cur_col}) em {steps} passos!')
         Grid.draw_path(self.__env.map, path)
 
     def print_qtable(self):
@@ -150,7 +148,7 @@ class QLearn:
             for j in range(self.__env.cols):
                 print(self.__q_table[i, j])
 
-class StuckException(Exception):
 
+class StuckException(Exception):
     def __init__(self):
         pass
