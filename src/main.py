@@ -3,19 +3,18 @@ import data
 
 from environment import Environment
 from qlearn import QLearn
-from grid import Grid
+
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Finding the optimal path to an objective with Q-Learning.')
+    parser = argparse.ArgumentParser(description='Encontrando o caminho ótimo até um objetivo com Q-Learning.')
 
     parser.add_argument('-f', '--fixed-exploration',
                         action='store_true', dest='fixed_exploration',
-                        help='Forces every episode to begin at the same position.')
+                        help='Força todos os episódios a começarem de uma posição fixa.')
 
     parser.add_argument('episodes', type=int,
-                        help='Number of episodes used for training.')
+                        help='Número de episódios para executar no treinamento.')
 
     # TODO(Quem sabe dá pra fazer isso pro gamma e epsilon também?)
 
@@ -25,14 +24,13 @@ def parse_args():
 
 def read_initial_position():
     row, col = '', ''
-    input_value = input(
-        'Please insert the starting position (x,y) or press Enter to exit: ')
+    input_value = input('Insira a posição inicial (x,y) ou dê Enter para sair: ')
 
     try:
         row, col = [int(n) for n in input_value.split(',')]
     except ValueError:
         if input_value:
-            print('Invalid position.')
+            print('Posição inválida.')
 
     return row, col
 

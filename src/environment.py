@@ -44,7 +44,6 @@ class Environment:
         row = env_row
         col = env_col
 
-        # TODO(Ainda não confio muito nisso aqui, honestamente)
         if action == Action.UP and env_row > 0:
             row -= 1
         elif action == Action.DOWN and env_row < self.rows - 1:
