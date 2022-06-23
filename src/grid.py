@@ -20,3 +20,4 @@ class Grid:
 
         plt.imshow(map, interpolation='nearest', cmap=cmap)
         plt.show()
+        plt.clf()
