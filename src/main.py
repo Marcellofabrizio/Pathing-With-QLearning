@@ -16,8 +16,6 @@ def parse_args():
     parser.add_argument('episodes', type=int,
                         help='Número de episódios para executar no treinamento.')
 
-    # TODO(Quem sabe dá pra fazer isso pro gamma e epsilon também?)
-
     args = parser.parse_args()
     return args.fixed_exploration, args.episodes
 
@@ -57,3 +55,4 @@ if __name__ == '__main__':
 
             actions = qlearn.get_optimal_actions(initial_row, initial_col)
             qlearn.print_shortest_path(actions, initial_row, initial_col)
+            # qlearn.print_qtable()
