@@ -21,7 +21,7 @@ class QLearn:
 
         self.optimal_episode = None
 
-    def train(self, episodes, fixed_exploration):
+    def train(self, episodes, initial_row, initial_col):
         """
         Repeatedly map out the environment over given number of episodes,
         updating Q-Table along.
@@ -31,13 +31,15 @@ class QLearn:
         """
 
         for i in range(episodes):
-            row, col = self.__env.get_initial_state(fixed_exploration)
+            row = initial_row
+            col = initial_col
 
-            try:
-                while self.__env.reward(row, col) != Rewards.OBJECTIVE:
-                    row, col = self.update_q_value(row, col)
-            except StuckException:
-                continue
+            path = []
+            path.append((row, col))
+
+            while self.__env.reward(row, col) != Rewards.OBJECTIVE:
+                row, col = self.update_q_value(row, col)
+                path.append((row, col))
 
     def update_q_value(self, row, col):
         """
@@ -48,22 +50,11 @@ class QLearn:
 
         self.__prev_q_table = np.copy(self.__q_table)
 
-        attempts = 0
-
         # Get the next action
         action = self.get_next_action(row, col)
         old_row, old_col = row, col
-
         # Perform the action, changing current state
         row, col = self.__env.get_next_location(old_row, old_col, action)
-
-        while self.__env.reward(row, col) == Rewards.WALL and attempts < 10:
-            action = self.get_next_action(old_row, old_col)
-            row, col = self.__env.get_next_location(old_row, old_col, action)
-            attempts += 1
-
-        if attempts == 10:
-            raise StuckException
 
         # Get the reward associated with reaching new state
         reward = self.__env.reward(row, col)
@@ -100,22 +91,14 @@ class QLearn:
     def get_optimal_actions(self, initial_row, initial_col) -> List[Action]:
 
         actions = []
-        current_row, current_col = initial_row, initial_col
 
-        if self.__env.reward(initial_row, initial_col) != Rewards.CELL:
-            return actions
+        current_row = initial_row
+        current_col = initial_col
 
-        else:
-            attempts = 0
-            while self.__env.reward(current_row, current_col) != Rewards.OBJECTIVE and attempts < 1:
-                action = self.exploit(current_row, current_col)
-                current_row, current_col = self.__env.get_next_location(current_row, current_col, action)
-
-                if self.__env.reward(current_row, current_col) != Rewards.WALL:
-                    actions.append(action)
-                    attempts = 0
-                else:
-                    attempts += 1
+        while self.__env.reward(current_row, current_col) != Rewards.OBJECTIVE:
+            action = self.exploit(current_row, current_col)
+            current_row, current_col = self.__env.get_next_location(current_row, current_col, action)
+            actions.append(action)
 
         return actions
 
@@ -132,7 +115,7 @@ class QLearn:
 
         steps = 0
         path = []
-        cur_row, cur_col = initial_row, initial_col
+        cur_row, cur_col = (initial_row, initial_col)
         path.append((cur_row, cur_col))
 
         for action in actions:
